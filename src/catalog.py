@@ -14,11 +14,11 @@ class TMDBError(RuntimeError):
     """Raised when TMDB does not return a usable catalog response."""
 
 
-def _get_json(endpoint: str, api_key: str) -> dict[str, Any]:
+def _get_json(endpoint: str, api_key: str, language: str) -> dict[str, Any]:
     try:
         response = requests.get(
             f"{TMDB_BASE_URL}/{endpoint}",
-            params={"api_key": api_key},
+            params={"api_key": api_key, "language": language},
             timeout=15,
         )
         response.raise_for_status()
@@ -34,9 +34,9 @@ def _get_json(endpoint: str, api_key: str) -> dict[str, Any]:
 
 
 @st.cache_data(ttl=3600, show_spinner=False)
-def fetch_catalog(api_key: str) -> tuple[list[dict[str, Any]], list[str]]:
-    genre_payload = _get_json("genre/movie/list", api_key)
-    trending_payload = _get_json("trending/movie/week", api_key)
+def fetch_catalog(api_key: str, language: str = "en-US") -> tuple[list[dict[str, Any]], list[str]]:
+    genre_payload = _get_json("genre/movie/list", api_key, language)
+    trending_payload = _get_json("trending/movie/week", api_key, language)
     genre_map = {
         genre["id"]: genre["name"]
         for genre in genre_payload.get("genres", [])
@@ -54,7 +54,7 @@ def fetch_catalog(api_key: str) -> tuple[list[dict[str, Any]], list[str]]:
         movies.append(
             {
                 "id": movie.get("id"),
-                "title": movie.get("title") or "Tanpa judul",
+                "title": movie.get("title") or "Untitled",
                 "overview": movie.get("overview") or "",
                 "release_date": movie.get("release_date") or "",
                 "popularity": float(movie.get("popularity") or 0),
