@@ -272,7 +272,7 @@ def main() -> None:
     st.sidebar.caption(text["tmdb_credit"])
 
     st.markdown(
-        """
+        f"""
         <div class="hero">
             <div class="eyebrow">{text["hero_eyebrow"]}</div>
             <h1>{text["hero_title"]}</h1>
@@ -348,7 +348,10 @@ def main() -> None:
             plot_bgcolor="rgba(0,0,0,0)",
             coloraxis_colorbar=dict(title=text["rating"]),
         )
-        chart.update_traces(marker_line_width=0, hovertemplate="%{y}<br>Popularitas %{x:.1f}<extra></extra>")
+        chart.update_traces(
+            marker_line_width=0,
+            hovertemplate=f"%{{y}}<br>{text['popularity']} %{{x:.1f}}<extra></extra>",
+        )
         st.plotly_chart(chart, width="stretch")
 
     st.markdown(
